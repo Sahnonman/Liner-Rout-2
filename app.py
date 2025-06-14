@@ -4,10 +4,10 @@ import pandas as pd
 import io
 from pulp import LpProblem, LpMinimize, LpVariable, lpSum, LpInteger
 
-st.set_page_config(page_title="Transport Optimizer - Min Company Trips", page_icon="🚛")
+st.set_page_config(page_title="Transport Optimizer - Final Version", page_icon="🚛")
 
-st.title("🚛 Transport Route Optimizer (Min Company Trips Constraint)")
-st.markdown("Upload your demand data, define fleet size, min company trips and conditions.")
+st.title("🚛 Transport Route Optimizer (Final Version with Advice)")
+st.markdown("Upload your demand data, set constraints, and compute the optimal distribution with advice.")
 
 uploaded_file = st.file_uploader("📂 Upload Excel File", type=["xlsx"])
 
@@ -88,20 +88,19 @@ if uploaded_file:
         result_df = pd.DataFrame(results)
         st.subheader("📊 Optimized Distribution Result")
         st.dataframe(result_df)
-        st.info(f"✅ Grand Total Cost: {total_cost} SAR")# حساب إجمالي الرحلات للشركة و3PL
-company_total_trips = sum(result_df["Company_Trips"])
-pl3_total_trips = sum(result_df["3PL_Trips"])
+        st.info(f"✅ Grand Total Cost: {total_cost} SAR")
 
-# تقديم نصيحة بناءً على التوزيع
-if company_total_trips > pl3_total_trips:
-    st.success("🚀 التوزيع يستفيد بشكل جيد من أسطول الشركة مع تقليل الاعتماد على 3PL.")
-elif pl3_total_trips > company_total_trips * 2:
-    st.warning("⚠️ الاعتماد على 3PL مرتفع جدًا. قد يكون من المفيد مراجعة التكاليف أو زيادة عدد شاحنات الشركة.")
-else:
-    st.info("💡 التوزيع متوازن. يمكنك مراجعة هيكل التكلفة لمزيد من التوفير.")
+        # Advice section
+        company_total_trips = sum(result_df["Company_Trips"])
+        pl3_total_trips = sum(result_df["3PL_Trips"])
+        if company_total_trips > pl3_total_trips:
+            st.success("🚀 التوزيع يستفيد بشكل جيد من أسطول الشركة مع تقليل الاعتماد على 3PL.")
+        elif pl3_total_trips > company_total_trips * 2:
+            st.warning("⚠️ الاعتماد على 3PL مرتفع جدًا. قد يكون من المفيد مراجعة التكاليف أو زيادة عدد شاحنات الشركة.")
+        else:
+            st.info("💡 التوزيع متوازن. يمكنك مراجعة هيكل التكلفة لمزيد من التوفير.")
 
-        
-
+        # Export
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
             result_df.to_excel(writer, index=False)
@@ -110,18 +109,9 @@ else:
         st.download_button(
             label="⬇️ Download Optimized Plan as Excel",
             data=output,
-            file_name="Route_Optimized_MinCompany.xlsx",
+            file_name="Route_Optimized_Final.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 else:
     st.info("📌 Please upload a file to start.")
-
-company_total_trips = sum(result_df["Company_Trips"])
-pl3_total_trips = sum(result_df["3PL_Trips"])
-if company_total_trips > pl3_total_trips:
-    st.success("🚀 Distribution effectively utilizes company fleet with minimal 3PL dependency.")
-elif pl3_total_trips > company_total_trips * 2:
-    st.warning("⚠️ High dependency on 3PL detected. Consider increasing company fleet or revising costs.")
-else:
-    st.info("💡 Balanced distribution achieved. You may review cost structure for further savings.")
 
