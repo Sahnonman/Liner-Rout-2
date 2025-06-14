@@ -103,3 +103,13 @@ if uploaded_file:
         )
 else:
     st.info("📌 Please upload a file to start.")
+
+company_total_trips = sum(result_df["Company_Trips"])
+pl3_total_trips = sum(result_df["3PL_Trips"])
+if company_total_trips > pl3_total_trips:
+    st.success("🚀 Distribution effectively utilizes company fleet with minimal 3PL dependency.")
+elif pl3_total_trips > company_total_trips * 2:
+    st.warning("⚠️ High dependency on 3PL detected. Consider increasing company fleet or revising costs.")
+else:
+    st.info("💡 Balanced distribution achieved. You may review cost structure for further savings.")
+
