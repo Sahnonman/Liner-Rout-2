@@ -88,7 +88,19 @@ if uploaded_file:
         result_df = pd.DataFrame(results)
         st.subheader("📊 Optimized Distribution Result")
         st.dataframe(result_df)
-        st.info(f"✅ Grand Total Cost: {total_cost} SAR")
+        st.info(f"✅ Grand Total Cost: {total_cost} SAR")# حساب إجمالي الرحلات للشركة و3PL
+company_total_trips = sum(result_df["Company_Trips"])
+pl3_total_trips = sum(result_df["3PL_Trips"])
+
+# تقديم نصيحة بناءً على التوزيع
+if company_total_trips > pl3_total_trips:
+    st.success("🚀 التوزيع يستفيد بشكل جيد من أسطول الشركة مع تقليل الاعتماد على 3PL.")
+elif pl3_total_trips > company_total_trips * 2:
+    st.warning("⚠️ الاعتماد على 3PL مرتفع جدًا. قد يكون من المفيد مراجعة التكاليف أو زيادة عدد شاحنات الشركة.")
+else:
+    st.info("💡 التوزيع متوازن. يمكنك مراجعة هيكل التكلفة لمزيد من التوفير.")
+
+        
 
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
